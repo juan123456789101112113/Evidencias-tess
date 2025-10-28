@@ -6,8 +6,8 @@ carros = [
     {'id': 1, 'marca': 'Toyota', 'modelo': 'Corolla', 'año': 2020},
     {'id': 2, 'marca': 'Honda', 'modelo': 'Civic', 'año': 2019},
     {'id': 3, 'marca': 'Ford', 'modelo': 'Focus', 'año': 2018},
-    {'id': 3, 'marca': 'Volswagen', 'modelo': 'dsinfid', 'año': 2018},
-    {'id': 3, 'marca': 'Ford', 'modelo': 'Focus', 'año': 2018}
+    {'id': 4, 'marca': 'Volkswagen', 'modelo': 'Golf', 'año': 2019},
+    {'id': 5, 'marca': 'Chevrolet', 'modelo': 'Cruze', 'año': 2022}
 ]
 
 @app.route('/carros/', methods=['GET'])
@@ -41,7 +41,7 @@ def post_carro():
             "año": body["año"],
     }
     carros.append(new_carro)
-    return new_carro, 200
+    return new_carro, 201
 
 @app.route('/carros/<string:carro_id>/', methods=['DELETE'])
 def delete_carro(carro_id):
