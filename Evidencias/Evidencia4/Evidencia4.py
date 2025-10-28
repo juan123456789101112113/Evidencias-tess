@@ -185,7 +185,7 @@ def create_new_user():
 def delete_carro(carro_id):
     global carros
     carros = list(filter(lambda x: x["id"] != int(carro_id), carros))
-    return f"se borro el carro de id: {carro_id}", 204
+    return f"se borro el carro de id: {carro_id}", 200
 
 
 if __name__ == '__main__':
