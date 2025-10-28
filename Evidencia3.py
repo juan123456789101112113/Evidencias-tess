@@ -5,6 +5,8 @@ app = Flask(__name__)
 carros = [
     {'id': 1, 'marca': 'Toyota', 'modelo': 'Corolla', 'año': 2020},
     {'id': 2, 'marca': 'Honda', 'modelo': 'Civic', 'año': 2019},
+    {'id': 3, 'marca': 'Ford', 'modelo': 'Focus', 'año': 2018},
+    {'id': 3, 'marca': 'Volswagen', 'modelo': 'dsinfid', 'año': 2018},
     {'id': 3, 'marca': 'Ford', 'modelo': 'Focus', 'año': 2018}
 ]
 
