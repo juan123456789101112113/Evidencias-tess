@@ -18,9 +18,9 @@ if env_path.exists():
 db_name = os.getenv('MONGO_DB')
 host = os.getenv('MONGO_HOST')
 port = int(os.getenv('MONGO_PORT', 0))
-admin_password = int(os.getenv('admin_pass', 0))
-manager_password = int(os.getenv('manager_pass', 0))
-first_client = int(os.getenv('first_client_pass', 0))
+admin_password = os.getenv('admin_pass')
+manager_password = os.getenv('manager_pass')
+first_client = os.getenv('first_client_pass')
 
 print(f"host is: {host} and database name is {db_name}")
 
