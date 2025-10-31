@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bienvenido - Flask App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>🎉 ¡Bienvenido!</h1>
+        <p>Esta es una página HTML con estilos CSS servida desde Flask.</p>
+        <div class="highlight">{{ current_time }}</div>
+        <p>✨ MongoDB está <strong>{{ db_status }}</strong></p>
+    </div>
+</body>
+</html>
