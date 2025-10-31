@@ -170,15 +170,15 @@ def post_carro():
 def create_new_user():
     print(f"body: {request.json}")
     body = request.json
-    new_carro ={
+    new_user ={
             'id': body["id"],
             'username': body["username"],
             'password_hash': generate_password_hash(body["password_hash"]),
             'role': body["role"],
             'created_at': body["created_at"]
     }
-    carros.append(new_carro)
-    return new_carro, 201
+    users.append(new_user)
+    return new_user, 201
 
 @app.route('/carros/<string:carro_id>/', methods=['DELETE'])
 @admin_required

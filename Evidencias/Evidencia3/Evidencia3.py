@@ -5,20 +5,31 @@ from flask_jwt_extended import JWTManager, jwt_required, get_jwt, create_access_
 from functools import wraps
 from pymongo import MongoClient
 from bson import ObjectId
+from dotenv import load_dotenv
+from pathlib import Path
 import os
 
+# Cargar archivo .env solo si existe (para desarrollo local)
+env_path = Path('.') / '.env'
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
+
+# Obtener variables del entorno con valores por defecto
+db_name = os.getenv('MONGO_DB')
+host = os.getenv('MONGO_HOST')
+port = int(os.getenv('MONGO_PORT', 0))
+
+print(f"host is: {host} and database name is {db_name}")
 
 app = Flask(__name__)
 
 jwt = JWTManager(app)
-app.config['JWT_SECRET_KEY'] = 'tu-clave-super-secreta-cambiar-en-produccion'  # ¡Cambiar en producción!
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = os.getenv("JWT_ACCESS_TOKEN_EXPIRES")
 
-MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
-DATABASE_NAME = os.getenv('DATABASE_NAME', 'flask_app')
 try:
-    client = MongoClient(MONGO_URI)
-    db = client[DATABASE_NAME]
+    client = MongoClient(str(host)+":"+str(port)+"/")
+    db = client[db_name]
     users_collection = db.users
     cars_collection = db.cars
     # Probar la conexión
@@ -43,21 +54,21 @@ def initialize_users():
                 'username': 'manager',
                 'password_hash': generate_password_hash('manager123'),  # Password: manager123
                 'role': 'manager',
-                'created_at': '2024-01-15T11:00:00Z'
+                'created_at': datetime.now()
             },
             {
                 'id': 'user-1',
                 'username': 'admin1',
                 'password_hash': generate_password_hash('admin123'),  # Password: manager123
                 'role': 'admin',
-                'created_at': '2024-01-15T11:00:00Z'
+                'created_at': datetime.now()
             },
             {   
                 'id': 'user-3',
                 'username': 'client1',
                 'password_hash': generate_password_hash('client123'),  # Password: manager123
                 'role': 'client',
-                'created_at': '2024-01-15T11:00:00Z'
+                'created_at': datetime.now()
             }
         ]
         users_collection.insert_many(users_data)
@@ -80,27 +91,6 @@ def initialize_cars():
 
         cars_collection.insert_many(cars_data)
         print("✅ Escritorios iniciales creados en MongoDB")
-
-users = {"manager": {
-                    'id': 'user-2',
-                    'username': 'manager',
-                    'password_hash': generate_password_hash('manager123'),  # Password: manager123
-                    'role': 'manager',
-                    'created_at': '2024-01-15T11:00:00Z'
-                    },
-        "admin1":    {'id': 'user-1',
-                    'username': 'admin1',
-                    'password_hash': generate_password_hash('admin123'),  # Password: manager123
-                    'role': 'admin',
-                    'created_at': '2024-01-15T11:00:00Z'
-                    },
-        "client":    {'id': 'user-3',
-                    'username': 'client1',
-                    'password_hash': generate_password_hash('client123'),  # Password: manager123
-                    'role': 'client',
-                    'created_at': '2024-01-15T11:00:00Z'
-                    }
-}
 
 
 @app.route('/auth/login', methods=['POST'])
@@ -187,15 +177,6 @@ def get_user_count():
         return 0
     return users_collection.count_documents({})
 
-
-cars = [
-    {'id': 1, 'marca': 'Toyota', 'modelo': 'Corolla', 'año': 2020},
-    {'id': 2, 'marca': 'Honda', 'modelo': 'Civic', 'año': 2019},
-    {'id': 3, 'marca': 'Ford', 'modelo': 'Focus', 'año': 2018},
-    {'id': 4, 'marca': 'Volkswagen', 'modelo': 'Golf', 'año': 2019},
-    {'id': 5, 'marca': 'Chevrolet', 'modelo': 'Cruze', 'año': 2022}
-]
-
 def get_current_user_role():
     """
     Obtiene el rol del usuario actual desde el JWT
@@ -245,7 +226,7 @@ def get_all_cars():
     print(f"marca {marca_query_param}, modelo {modelo_query_param}")
     
     try:
-        cars = get_all_desks_filtered(width_query_param, height_query_param)
+        cars = get_all_cars_filtered(marca_query_param, marca_query_param)
 
     # Normalizar la respuesta para mantener compatibilidad
         result = []
@@ -253,55 +234,98 @@ def get_all_cars():
             car_copy = car.copy()
             if '_id' in car_copy:
                 del car_copy['_id']  # Remover ObjectId de MongoDB
-            if 'desk_id' in car_copy:
-                car_copy['id'] = car_copy['desk_id']  # Mantener compatibilidad con 'id'
+            if 'car_id' in car_copy:
+                car_copy['id'] = car_copy['car_id']  # Mantener compatibilidad con 'id'
             result.append(car_copy)
-        
+            
+        return result, 200
+    except Exception as e:
+        return jsonify({
+            'error': 'Error de base de datos',
+            'message': f'No se puede conectar a la base de datos. Error: {e}'
+        }), 503
+
+def get_all_cars_filtered(marca_filter=None, modelo_filter=None):
+    """Obtener todos los escritorios con filtros opcionales"""
+    if db is None:
+        raise Exception("MongoDB no está disponible. No se pueden consultar")
+
+    # Construir filtro para MongoDB
+    filter_query = {}
+    if marca_filter:
+        filter_query["marca"] = {"$gte": int(marca_filter)}
+    if modelo_filter:
+        filter_query["modelo"] = {"$gte": int(modelo_filter)}
+
+    return list(cars_collection.find(filter_query))
+
 @app.route('/cars/<string:car_id>/', methods=['GET'])
 @role_required
 def get_car_by_id(car_id):
-    ans = list(filter(lambda x: x ["id"] == int(car_id), cars))
-    if len(ans) > 0:
-        return ans[0], 200
-    else:
-        return {"mensaje": "car no existe"}, 404
+    """Obtener escritorio por ID desde MongoDB"""
+    if db is None:
+        raise Exception("MongoDB no está disponible. No se pueden consu") 
+    return cars_collection.find_one({"car_id": int(car_id)})
 
-@app.route('/cars/', methods=['POST'])
+@app.route('/cars', methods=['POST'])
 @admin_required
-def post_car(): 
-    print(f"body: {request.json}")
-    body = request.json
-    new_car ={
-            "id": body["id"],
-            "marca": body["marca"],
-            "modelo": body["modelo"],
-            "año": body["año"],
+def add_new_car(car_data):
+    """Agregar nuevo carro a MongoDB"""
+    if db is None:
+        raise Exception("MongoDB no está disponible. No se pueden crear carros.")
+
+    # Obtener el próximo ID
+    max_cars = cars_collection.find().sort("cars_id", -1).limit(1)
+    next_id = 1
+    for car in max_cars:
+        next_id = car["car_id"] + 1
+        break
+
+    new_car = {
+            "car_id": next_id,
+            "marca": car_data["marca"],
+            "modelo": car_data["modelo"],
+            "año": car_data["año"]
     }
-    cars.append(new_car)
+    result = cars_collection.insert_one(new_car)
+    new_car["_id"] = result.inserted_id
     return new_car, 201
 
 @app.route('/new_user', methods=['POST'])
 @admin_required
-def create_new_user():
-    print(f"body: {request.json}")
-    body = request.json
-    new_car ={
-            'id': body["id"],
-            'username': body["username"],
-            'password_hash': generate_password_hash(body["password_hash"]),
-            'role': body["role"],
-            'created_at': body["created_at"]
-    }
-    cars.append(new_car)
-    return new_car, 201
+def create_new_user(user_data):
+    """Agregar nuevo carro a MongoDB"""
+    if db is None:
+        raise Exception("MongoDB no está disponible. No se pueden crear carros.")
 
-@app.route('/cars/<string:car_id>/', methods=['DELETE'])
+    # Obtener el próximo ID
+    max_users = users_collection.find().sort("cars_id", -1).limit(1)
+    next_id = 1
+    for user in max_users:
+        next_id = user["car_id"] + 1
+        break
+    new_user ={
+            'id': next_id,
+            'username': user_data["username"],
+            'password_hash': generate_password_hash(user_data["password_hash"]),
+            'role': user_data["role"],
+            'created_at': user_data["created_at"]
+    }
+    result = users_collection.insert_one(new_user)
+    new_user["_id"] = result.inserted_id
+    return new_user, 201
+
+@app.route('/cars/<int:car_id>/', methods=['DELETE'])
 @admin_required
 def delete_car(car_id):
-    global cars
-    cars = list(filter(lambda x: x["id"] != int(car_id), cars))
-    return f"se borro el car de id: {car_id}", 200
-
+    try:
+        result = cars_collection.delete_one({'car_id': car_id})
+        if result.deleted_count == 0:
+            return "El carro no fue encontrado", 404
+        return f"Se borró el carro con id: {car_id}", 200
+    except Exception as e:
+        return f"Error del servidor: {str(e)}", 500
+    
 
 ############################# HTML-CSS- parte de MONGO ########################################
 
