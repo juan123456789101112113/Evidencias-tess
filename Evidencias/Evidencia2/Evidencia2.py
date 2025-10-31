@@ -7,7 +7,7 @@ from functools import wraps
 app = Flask(__name__)
 
 jwt = JWTManager(app)
-app.config['JWT_SECRET_KEY'] = 'tu-clave-super-secreta-cambiar-en-produccion'  # ¡Cambiar en producción!
+app.config['JWT_SECRET_KEY'] = 'tu-clave-super-secreta-cambiar-en-produccion'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 users = {"manager": {
@@ -19,13 +19,13 @@ users = {"manager": {
                     },
         "admin1":    {'id': 'user-1',
                     'username': 'admin1',
-                    'password_hash': generate_password_hash('admin123'),  # Password: manager123
+                    'password_hash': generate_password_hash('admin123'),  # Password: admin123
                     'role': 'admin',
                     'created_at': '2024-01-15T11:00:00Z'
                     },
         "client":    {'id': 'user-3',
                     'username': 'client1',
-                    'password_hash': generate_password_hash('client123'),  # Password: manager123
+                    'password_hash': generate_password_hash('client123'),  # Password: client123
                     'role': 'client',
                     'created_at': '2024-01-15T11:00:00Z'
                     }
