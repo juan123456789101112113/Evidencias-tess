@@ -7,7 +7,7 @@ car_bp = Blueprint('car', __name__)
 @car_bp.route('/<string:car_id>/', methods=["GET"])
 @role_required
 def get_car(car_id):
-    """Obtener escritorio por ID"""
+    """Obtener carro por ID"""
     try:
         car = get_car_by_id(car_id)
         if car:
@@ -29,13 +29,13 @@ def get_car(car_id):
 @car_bp.route('', methods=["GET"])
 @role_required
 def get_all_cars():
-    """Obtener todos los escritorios con filtros opcionales"""
-    width_query_param = request.args.get("width")
-    height_query_param = request.args.get("height")
-    print(f"width {width_query_param}, height {height_query_param}")
+    """Obtener todos los carros con filtros opcionales"""
+    marca_query_param = request.args.get("marca")
+    modelo_query_param = request.args.get("modelo")
+    print(f"marca {marca_query_param}, modelo {modelo_query_param}")
     
     try:
-        cars = get_all_cars_filtered(width_query_param, height_query_param)
+        cars = get_all_cars_filtered(marca_query_param, modelo_query_param)
         
         # Normalizar la respuesta para mantener compatibilidad
         result = []
@@ -57,22 +57,22 @@ def get_all_cars():
 @car_bp.route('', methods=["POST"])
 @admin_required
 def post_car():
-    """Crear nuevo escritorio (solo administradores)"""
+    """Crear nuevo carro (solo administradores)"""
     print(f"Body: {request.json}")
     body = request.json
     
     # Validar datos requeridos
-    if not all(key in body for key in ['name', 'width', 'height']):
+    if not all(key in body for key in ['name', 'marca', 'modelo']):
         return jsonify({
             'error': 'Datos incompletos',
-            'message': 'Se requieren name, width y height'
+            'message': 'Se requieren name, marca y modelo'
         }), 400
     
     try:
         new_car_data = {
-            "name": body["name"],
-            "width": body["width"],
-            "height": body["height"]
+            "marca": body["marca"],
+            "modelo": body["modelo"],
+            "año": body["año"]
         }
         
         new_car = add_new_car(new_car_data)
