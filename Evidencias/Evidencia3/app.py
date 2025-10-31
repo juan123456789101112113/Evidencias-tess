@@ -55,21 +55,21 @@ def initialize_users():
             {
                 'id': 'user-2',
                 'username': 'manager',
-                'password_hash': generate_password_hash(manager_password),  # Password: manager123
+                'password_hash': generate_password_hash(manager_password),
                 'role': 'manager',
                 'created_at': datetime.now()
             },
             {
                 'id': 'user-1',
                 'username': 'admin1',
-                'password_hash': generate_password_hash(admin_password),  # Password: manager123manager_password
+                'password_hash': generate_password_hash(admin_password),
                 'role': 'admin',
                 'created_at': datetime.now()
             },
             {   
                 'id': 'user-3',
                 'username': 'client1',
-                'password_hash': generate_password_hash(first_client),  # Password: manager123
+                'password_hash': generate_password_hash(first_client),
                 'role': 'client',
                 'created_at': datetime.now()
             }
@@ -122,7 +122,7 @@ def login():
         return error_response, status_code
     
     # Crear token JWT
-    user_id = user.get('user_id') or user.get('id') # Compat
+    user_id = user.get('user_id') or user.get('id')
     access_token = create_access_token(
         identity=username,
         additional_claims={
