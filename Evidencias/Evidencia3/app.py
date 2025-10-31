@@ -18,6 +18,9 @@ if env_path.exists():
 db_name = os.getenv('MONGO_DB')
 host = os.getenv('MONGO_HOST')
 port = int(os.getenv('MONGO_PORT', 0))
+admin_password = int(os.getenv('admin_pass', 0))
+manager_password = int(os.getenv('manager_pass', 0))
+first_client = int(os.getenv('first_client_pass', 0))
 
 print(f"host is: {host} and database name is {db_name}")
 
@@ -52,21 +55,21 @@ def initialize_users():
             {
                 'id': 'user-2',
                 'username': 'manager',
-                'password_hash': generate_password_hash('manager123'),  # Password: manager123
+                'password_hash': generate_password_hash(manager_password),  # Password: manager123
                 'role': 'manager',
                 'created_at': datetime.now()
             },
             {
                 'id': 'user-1',
                 'username': 'admin1',
-                'password_hash': generate_password_hash('admin123'),  # Password: manager123
+                'password_hash': generate_password_hash(admin_password),  # Password: manager123manager_password
                 'role': 'admin',
                 'created_at': datetime.now()
             },
             {   
                 'id': 'user-3',
                 'username': 'client1',
-                'password_hash': generate_password_hash('client123'),  # Password: manager123
+                'password_hash': generate_password_hash(first_client),  # Password: manager123
                 'role': 'client',
                 'created_at': datetime.now()
             }
@@ -495,7 +498,7 @@ def welcome_page():
                                 current_time = current_time_value)
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
     html_content_404 = """
     <!DOCTYPE html>
     <html lang="es">
