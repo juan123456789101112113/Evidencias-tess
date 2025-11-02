@@ -297,15 +297,15 @@ def add_new_car(car_data):
 @app.route('/new_user', methods=['POST'])
 @admin_required
 def create_new_user(user_data):
-    """Agregar nuevo carro a MongoDB"""
+    """Agregar nuevo usuario a MongoDB"""
     if db is None:
-        raise Exception("MongoDB no está disponible. No se pueden crear carros.")
+        raise Exception("MongoDB no está disponible. No se pueden crear un nuevo usuario.")
 
     # Obtener el próximo ID
-    max_users = users_collection.find().sort("cars_id", -1).limit(1)
+    max_users = users_collection.find().sort("users_id", -1).limit(1)
     next_id = 1
     for user in max_users:
-        next_id = user["car_id"] + 1
+        next_id = user["users_id"] + 1
         break
     new_user ={
             'id': next_id,
