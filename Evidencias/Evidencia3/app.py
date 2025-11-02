@@ -278,7 +278,7 @@ def add_new_car(car_data):
         raise Exception("MongoDB no está disponible. No se pueden crear carros.")
 
     # Obtener el próximo ID
-    max_cars = cars_collection.find().sort("cars_id", -1).limit(1)
+    max_cars = cars_collection.find().sort("car_id", -1).limit(1)
     next_id = 1
     for car in max_cars:
         next_id = car["car_id"] + 1
@@ -302,10 +302,10 @@ def create_new_user(user_data):
         raise Exception("MongoDB no está disponible. No se pueden crear un nuevo usuario.")
 
     # Obtener el próximo ID
-    max_users = users_collection.find().sort("users_id", -1).limit(1)
+    max_users = users_collection.find().sort("user_id", -1).limit(1)
     next_id = 1
     for user in max_users:
-        next_id = user["users_id"] + 1
+        next_id = user["user_id"] + 1
         break
     new_user ={
             'id': next_id,
