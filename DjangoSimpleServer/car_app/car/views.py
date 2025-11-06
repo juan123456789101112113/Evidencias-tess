@@ -113,7 +113,7 @@ def _handle_get_car(car_id):
     
     if not car:
         return Response(
-            {"error": f"No se encontró una mesa con id: {car_id}"},
+            {"error": f"No se encontró el carro con id: {car_id}"},
             status=status.HTTP_404_NOT_FOUND
         )
     
@@ -153,12 +153,12 @@ def _handle_delete_car(car_id):
             status=status.HTTP_404_NOT_FOUND
         )
     
-    car_name = car.name
+    car_name = car.marca
     car.delete()
     
     return Response(
         {
-            "message": f"Carro '{car_name}' eliminada exitosamente",
+            "message": f"Carro '{car_name}' eliminado exitosamente",
             "car_id": car_id
         },
         status=status.HTTP_200_OK
@@ -168,7 +168,7 @@ def _handle_delete_car(car_id):
 # ========== VISTAS (Dispatchers que delegan a funciones de lógica) ==========
 
 @api_view(['GET', 'POST'])
-def desk_list(request):
+def car_list(request):
     """
     GET  /api/car/  → Listar todos los carros
     POST /api/car/  → Crear un nuevo carro
