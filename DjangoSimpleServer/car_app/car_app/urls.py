@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('static-pages/', include('staticpages.url')),
-    path('api/car', include('car'))
+    path('static-pages/', include('staticpages.urls')),
+    path('api/v1/car/', include('car.urls')),
+    path('dynamic-pages/', include('dynamic_templates.urls'))
 ]

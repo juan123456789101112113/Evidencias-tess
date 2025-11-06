@@ -1,0 +1,21 @@
+{% extends 'dynamic_templates/base.html' %}
+
+{% block content %}
+<h2> Todos los carros</h2>
+
+{% for car_item in cars %}
+    <div class="car_item">
+        <h3><a href="{% url 'template_get_car' car_item.car_id %}">{{ car_item.marca }}</a></h3>
+        <p>modelo: {{ car_item.modelo }}</p>
+        <p>año: {{ car_item.año }}</p>
+    </div>
+{% empty %}
+    <div class="car_item">
+        <h3>No hay carros aún</h3>
+    </div>
+{% endfor %}
+
+<div style="margin-top: 30px; text-align: center;">
+    <small>Total de carros: {{ cars|length }}</small>
+</div>
+{% endblock %}

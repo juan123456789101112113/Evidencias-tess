@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
-class CarConfig(AppConfig):
+
+class DynamicTemplatesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'car'
+    name = 'dynamic_templates'

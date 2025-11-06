@@ -11,10 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+import mongoengine
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Cargar variables de entorno desde el archivo .env
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -25,7 +30,7 @@ SECRET_KEY = 'django-insecure-rlgsmgyfp$@=-1uq%7ekr7jo3qxxts0l0!3u9bty3k-!$my2^=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -37,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'staticpages',
-    'car'
+    'car',
+    'dynamic_templates'
 ]
 
 MIDDLEWARE = [
@@ -122,3 +129,36 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MongoDB Configuration
+# Primero intentamos usar MONGODB_URI si existe (útil para MongoDB Atlas)
+MONGODB_URI = os.getenv('MONGODB_URI')
+
+if MONGODB_URI:
+    # Si existe MONGODB_URI, úsalo directamente
+    mongoengine.connect(host=MONGODB_URI)
+else:
+    # Si no, construye la conexión con las variables individuales
+    MONGODB_HOST = os.getenv('MONGODB_HOST', 'localhost')
+    MONGODB_PORT = int(os.getenv('MONGODB_PORT', 27017))
+    MONGODB_DB = os.getenv('MONGODB_DB', 'car_database')
+    MONGODB_USERNAME = os.getenv('MONGODB_USERNAME', '')
+    MONGODB_PASSWORD = os.getenv('MONGODB_PASSWORD', '')
+    
+    # Conectar a MongoDB
+    if MONGODB_USERNAME and MONGODB_PASSWORD:
+        mongoengine.connect(
+            db=MONGODB_DB,
+            host=MONGODB_HOST,
+            port=MONGODB_PORT,
+            username=MONGODB_USERNAME,
+            password=MONGODB_PASSWORD,
+            authentication_source='admin'  # Base de datos de autenticación
+        )
+    else:
+        # Conexión sin autenticación (útil para desarrollo local)
+        mongoengine.connect(
+            db=MONGODB_DB,
+            host=MONGODB_HOST,
+            port=MONGODB_PORT
+        )
