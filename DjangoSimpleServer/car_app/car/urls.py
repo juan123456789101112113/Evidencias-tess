@@ -31,4 +31,7 @@ urlpatterns = [
     # Recurso individual: /api/car/<id>
     # car_detail maneja GET, PUT, PATCH y DELETE
     path('<str:car_id>', views.car_detail, name='car_detail'),
+    
+    # Endpoint para imágenes: /api/car/items/?img=<nombre_imagen>
+    path('items/', views.items_list, name='items_list'),
 ]

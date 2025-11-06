@@ -6,6 +6,10 @@ from .models import Car
 from .serializers import CarSerializer
 from mongoengine.errors import DoesNotExist, ValidationError
 from bson.errors import InvalidId
+from django.http import FileResponse
+from django.conf import settings
+import os
+
 
 
 # ========== FUNCIONES AUXILIARES COMPARTIDAS ==========
@@ -199,3 +203,48 @@ def car_detail(request, car_id):
         return _handle_update_car(request, car_id)
     elif request.method == 'DELETE':
         return _handle_delete_car(car_id)
+
+# ========== VISTAS (imagen) ==========
+
+@api_view(['GET'])  # Solo permite GET
+def items_list(request):
+    """
+    GET /api/v1/car/items/?img=<nombre_imagen>  → Devolver imagen
+    """
+    param_value = request.query_params.get('img')
+    
+    if not param_value:
+        return Response(
+            {"error": "Se requiere el parámetro 'img' en la query string. Ejemplo: /items/?img=car.png"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Ruta a la carpeta img (en la raíz del proyecto car_app)
+    img_folder = settings.BASE_DIR / 'img'
+    image_path = img_folder / param_value
+    
+    # Verificar que el archivo existe
+    if not os.path.exists(image_path):
+        return Response(
+            {"error": f"No se encontró la imagen: {param_value}"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Determinar el tipo de contenido según la extensión
+    ext = os.path.splitext(param_value)[1].lower()
+    content_type_map = {
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.bmp': 'image/bmp',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml'
+    }
+    content_type = content_type_map.get(ext, 'image/png')
+    
+    # Devolver la imagen usando FileResponse
+    return FileResponse(
+        open(image_path, 'rb'),
+        content_type=content_type
+    )
