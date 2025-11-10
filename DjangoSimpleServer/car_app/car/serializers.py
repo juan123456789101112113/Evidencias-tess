@@ -7,7 +7,7 @@ class CarSerializer(serializers.Serializer):
     Serializer para el modelo Car de MongoDB
     Maneja la validación automática de campos
     """
-    car_id = serializers.CharField(read_only=True, source='id')
+    car_id = serializers.SerializerMethodField(read_only=True)
     marca = serializers.CharField(required=True, max_length=100)
     modelo = serializers.CharField(required=True, max_length=100)
     año = serializers.IntegerField(required=True, min_value=0)
