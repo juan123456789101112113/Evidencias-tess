@@ -5,7 +5,7 @@
 
 {% for car_item in cars %}
     <div class="car_item">
-        <h3><a href="{% url 'template_get_car' car_item.car_id %}">{{ car_item.marca }}</a></h3>
+        <h3>{{ car_item.marca }}</h3>
         <p>modelo: {{ car_item.modelo }}</p>
         <p>año: {{ car_item.año }}</p>
     </div>
