@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from car.models import Car
 
 # Create your views here.
 
@@ -16,8 +17,9 @@ def get_car(_,car_id):
 
 
 def get_cars(request):
+        cars_from_db = Car.objects.all()
         contexto = {
-        "cars" : cars,
+        "cars" : cars_from_db,
         "tab_title": "GET ALL CARS"
         }
         return render(request,'dynamic_templates/car_list.html', contexto)
