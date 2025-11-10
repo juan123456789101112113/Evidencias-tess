@@ -11,7 +11,7 @@ COPY ./car_app /app/
 # Configurar variables de entorno para MongoDB
 ENV MONGODB_HOST=host.docker.internal
 ENV MONGODB_PORT=27017
-ENV MONGODB_DB=desk_database
+ENV MONGODB_DB=car_database
 ENV MONGODB_USERNAME=
 ENV MONGODB_PASSWORD=
 
