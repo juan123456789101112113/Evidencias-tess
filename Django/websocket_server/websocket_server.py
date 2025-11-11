@@ -107,7 +107,7 @@ async def handle_websocket_connection(websocket):
                         "type": "car_notification",
                         "action": "created",
                         "car": car,
-                        "message": f"🪑 Nuevo carro creado: {car.get('marca', 'Sin marca')} ({car.get('modelo')} año{car.get('año')})",
+                        "message": f"🚗 Nuevo carro creado: {car.get('marca', 'Sin marca')} ({car.get('modelo')} año{car.get('año')})",
                         "timestamp": datetime.utcnow().isoformat() + 'Z'
                     }
                     await broadcast_message(notification)
