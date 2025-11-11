@@ -61,7 +61,7 @@ async def _async_send_message(message_data):
     Envía el mensaje al servidor WebSocket de forma asíncrona
     """
     try:
-        async with websockets.connect(WEBSOCKET_URL, timeout=2) as websocket:
+        async with websockets.connect(WEBSOCKET_URL, timeout=5) as websocket:
             await websocket.send(json.dumps(message_data))
             logger.info(f"✅ Notificación WebSocket enviada: {message_data['type']}")
     except asyncio.TimeoutError:

@@ -101,7 +101,7 @@ async def handle_websocket_connection(websocket):
                 logger.info(f"📥 Mensaje recibido de {client_id}: {data.get('type', 'unknown')}")
                 
                 # Procesar diferentes tipos de mensajes
-                if data.get("type") == "carro_created":
+                if data.get("type") == "car_created":
                     car = data.get("car", {})
                     notification = {
                         "type": "car_notification",
