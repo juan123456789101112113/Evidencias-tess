@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Car
 from .serializers import CarSerializer
+from .services import websocket_notifier
 from mongoengine.errors import DoesNotExist, ValidationError
 from bson.errors import InvalidId
 from django.http import FileResponse
@@ -103,13 +104,19 @@ def _handle_create_car(request):
     """Lógica para crear un nuevo carro"""
     print(f"Creando carro: {request.data}")
     
-    data, error = validate_and_save_car(request.data)
+    serializer = CarSerializer(data=request.data)
     
-    if error:
-        return error
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    return Response(data, status=status.HTTP_201_CREATED)
-
+    # Guardar el carro
+    car = serializer.save()
+    
+    # Enviar notificación WebSocket
+    websocket_notifier.notify_car_created(car)
+    ## Send email
+    
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def _handle_get_car(car_id):
     """Lógica para obtener un carro por ID"""
@@ -133,7 +140,7 @@ def _handle_update_car(request, car_id):
     
     if not car:
         return Response(
-            {"error": f"No se encontró una mesa con id: {car_id}"},
+            {"error": f"No se encontró un carro con id: {car_id}"},
             status=status.HTTP_404_NOT_FOUND
         )
     
@@ -148,12 +155,12 @@ def _handle_update_car(request, car_id):
 
 
 def _handle_delete_car(car_id):
-    """Lógica para eliminar una mesa"""
+    """Lógica para eliminar un carro"""
     car = get_car_or_404(car_id)
     
     if not car:
         return Response(
-            {"error": f"No se encontró una mesa con id: {car_id}"},
+            {"error": f"No se encontró un carro con id: {car_id}"},
             status=status.HTTP_404_NOT_FOUND
         )
     
