@@ -1,4 +1,4 @@
-FROM python:3.11.9
+FROM python:3.11-slim
 
 # Variables de entorno para Python
 ENV PYTHONUNBUFFERED=1 \
@@ -7,10 +7,9 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # Instalar dependencias del sistema (para MongoDB y debugging)
-#RUN apt-get update && \
-#    apt-get install -y --no-install-recommends \
-#    gc \
-#    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copiar e instalar dependencias de python
 COPY requirements.txt /app/
