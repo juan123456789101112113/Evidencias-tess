@@ -61,7 +61,7 @@ class CarNotificationConsumer:
                 car = data.get("car", {})
                 message_text = data.get("message", "")
                 
-                print(f"🪑 {message_text}")
+                print(f"🚗 {message_text}")
                 
                 # Mostrar detalles del carro
                 if car:
